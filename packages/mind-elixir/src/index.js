@@ -1,7 +1,7 @@
 import { visit } from "unist-util-visit";
 import { parse } from "yaml";
 
-import { escapeHtmlAttribute, splitDocuments, parseMindBody } from "./utils.js";
+import { splitDocuments, parseMindBody } from "./utils.js";
 
 const rehypeMindElixir = ({ useCdn = true } = {}) => {
   return function transformer(tree) {
@@ -75,7 +75,7 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
       properties: {},
       children: [
         {
-          type: "text",
+          type: "raw",
           value: "@import url('https://esm.sh/mind-elixir/style')",
         },
       ],
@@ -90,7 +90,7 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
       },
       children: [
         {
-          type: "text",
+          type: "raw",
           value: `
 import { MindMap } from 'https://esm.sh/@zikojs/mind-elixir@latest/src/mind/main.js'
 

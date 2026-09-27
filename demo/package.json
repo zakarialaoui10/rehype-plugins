@@ -3,7 +3,6 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "clean": "rimraf .astro dist",
     "dev": "astro dev",
     "start": "rimraf .astro && astro dev",
     "build": "astro build",

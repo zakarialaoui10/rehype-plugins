@@ -10,7 +10,7 @@ export default defineConfig({
 	markdown:{
 		processor: unified({
 			rehypePlugins: [
-				rehypeElixirMind
+				[rehypeElixirMind, {useCdn : true}]
 			],
 		}),
 	},
@@ -23,7 +23,8 @@ export default defineConfig({
 				{
 					label: 'Guides',
 					items: [
-						{ label: 'Example Guide', slug: 'guides/example' },
+						// { label: 'Example Guide', slug: 'guides/example' },
+						{ label: 'Mind Elixir', slug: 'guides/mind-elixir' },
 					],
 				},
 				{
