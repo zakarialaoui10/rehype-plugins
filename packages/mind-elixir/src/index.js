@@ -1,7 +1,7 @@
 import { visit } from "unist-util-visit";
-import { parse } from "yaml";
+import { parseAllDocuments } from "yaml";
 
-import { splitDocuments, parseMindBody } from "./utils.js";
+import { parseMindBody } from "./utils.js";
 
 const rehypeMindElixir = ({ useCdn = true } = {}) => {
   return function transformer(tree) {
@@ -19,7 +19,6 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
       if (!code) return;
 
       const className = code.properties?.className || [];
-
       const classes = Array.isArray(className) ? className : [className];
 
       if (!classes.includes("language-mind-elixir")) {
@@ -37,13 +36,15 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
       let config = {};
       let body = null;
 
-      const documents = splitDocuments(value.trim());
+      // Parse multi-document YAML using yaml's parseAllDocuments
+      const yamlDocs = parseAllDocuments(value.trim());
 
-      if (documents.length === 1) {
-        body = parseMindBody(documents[0]);
-      } else {
-        config = parse(documents[0]);
-        body = parseMindBody(documents[1]);
+      if (yamlDocs.length === 1) {
+        // If it's a single document, check if parseMindBody can handle it (supports JSON/JS/YAML)
+        body = parseMindBody(yamlDocs[0].toString());
+      } else if (yamlDocs.length >= 2) {
+        config = yamlDocs[0].toJSON() || {};
+        body = parseMindBody(yamlDocs[1].toString());
       }
 
       const serializedBody = JSON.stringify(body, (key, value) => {
@@ -69,7 +70,7 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
       return;
     }
 
-    tree.children.push({
+    const styleNode = {
       type: "element",
       tagName: "style",
       properties: {},
@@ -79,9 +80,9 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
           value: "@import url('https://esm.sh/mind-elixir/style')",
         },
       ],
-    });
+    };
 
-    tree.children.push({
+    const scriptNode = {
       type: "element",
       tagName: "script",
       properties: {
@@ -93,29 +94,67 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
           type: "raw",
           value: `
 import { MindMap } from 'https://esm.sh/@zikojs/mind-elixir@latest/src/mind/main.js'
+import { tags } from 'https://esm.sh/ziko@latest/src/dom/tags/index.js'          
 
-document.addEventListener('DOMContentLoaded', () => {
+function initMindMaps() {
   document.querySelectorAll('[data-mind-elixir]').forEach((element) => {
-    const body = element.dataset.xmindBody
-    const config = element.dataset.xmindConfig
+    if (element.dataset.rendered) return;
+    
+    const body = element.dataset.xmindBody;
+    const config = element.dataset.xmindConfig;
 
-    if (!body) return
+    if (!body) return;
 
-    const nodeData = JSON.parse(body)
-    const nodeConfig = JSON.parse(config)
+    element.dataset.rendered = "true";
+    const nodeData = JSON.parse(body);
+    const nodeConfig = config ? JSON.parse(config) : {};
 
     const map = MindMap(
-      { height: '400px', ...nodeConfig },
+      { height: '400px', width : '300px', ...nodeConfig },
       nodeData
-    )
+    );
 
-    map.mount(element)
-  })
-})
+    tags.div({}, map).style({
+      display : 'flex',
+      justifyContent: 'center',
+      border : '1px darkblue solid'
+    }).mount(element)
+
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMindMaps);
+} else {
+  initMindMaps();
+}
 `,
         },
       ],
+    };
+
+    // Safely find <head> and <body> if they exist, otherwise fallback to root tree
+    let headNode = null;
+    let bodyNode = null;
+
+    visit(tree, "element", (node) => {
+      if (node.tagName === "head") headNode = node;
+      if (node.tagName === "body") bodyNode = node;
     });
+
+    // Inject style into <head> (or prepend to root if no head exists)
+    if (headNode) {
+      headNode.children.push(styleNode);
+    } else {
+      tree.children.unshift(styleNode);
+    }
+
+    // Inject script into <body> (or append to root if no body exists)
+    if (bodyNode) {
+      bodyNode.children.push(scriptNode);
+    } else {
+      tree.children.push(scriptNode);
+    }
   };
 };
 
