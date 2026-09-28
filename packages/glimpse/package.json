@@ -1,0 +1,56 @@
+{
+  "name": "rehype-glimpse",
+  "version": "0.1.0",
+  "description": "A rehype plugin for embedding interactive Mind Elixir mind maps in Markdown.",
+  "keywords": [
+    "zikojs",
+    "zextra",
+    "rehype",
+    "unified",
+    "markdown",
+    "glimpse"
+  ],
+  "homepage": "https://github.com/zakarialaoui10/rehype-plugins#rehype-plugins",
+  "bugs": {
+    "url": "https://github.com/zakarialaoui10/rehype-plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zakarialaoui10/rehype-plugins.git",
+    "directory": "packages/glimpse"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    },
+    "./client": {
+      "import": "./src/client.js"
+    },
+    "./rehype": {
+      "import": "./src/rehype.js"
+    },
+    "./style": {
+      "import": "./src/style.css"
+    }
+  },
+  "license": "MIT",
+  "author": "Zakaria Elalaoui",
+  "type": "module",
+  "dependencies": {
+    "unist-util-visit": "^5.1.0",
+    "yaml": "^2.9.1",
+    "zextra": "^1.15.0",
+    "ziko": "catalog:"
+  },
+  "devDependencies": {
+    "remark-rehype": "catalog:",
+    "unified": "catalog:"
+  },
+  "scripts": {
+    "test": "pnpx vitest"
+  }
+}

@@ -13,8 +13,9 @@
     "@astrojs/markdown-remark": "^7.3.0",
     "@astrojs/starlight": "^0.42.0",
     "astro": "^7.2.10",
+    "sharp": "^0.35.3",
     "rehype-mind-elixir": "workspace:*",
-    "sharp": "^0.35.3"
+    "rehype-glimpse": "workspace:*"
   },
   "allowScripts": {
     "esbuild": true

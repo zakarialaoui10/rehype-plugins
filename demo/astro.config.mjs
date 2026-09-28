@@ -3,14 +3,15 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import rehypeElixirMind from 'rehype-mind-elixir'
-
+import rehypeGlimpse from 'rehype-glimpse'
 
 // https://astro.build/config
 export default defineConfig({
 	markdown:{
 		processor: unified({
 			rehypePlugins: [
-				[rehypeElixirMind, {useCdn : true}]
+				[rehypeElixirMind, {useCdn : true}],
+				rehypeGlimpse
 			],
 		}),
 	},
