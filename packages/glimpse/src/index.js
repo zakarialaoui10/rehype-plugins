@@ -57,7 +57,7 @@ const rehypeGlimpe = ({ useCdn = true } = {}) => {
       children: [
         {
           type: "raw",
-          value: "https://esm.sh/zextra/src/components/nav/glimpse/index.css",
+          value: "@import url('https://esm.sh/zextra@latest/src/components/nav/glimpse/index.css')",
         },
       ],
     };
@@ -73,15 +73,14 @@ const rehypeGlimpe = ({ useCdn = true } = {}) => {
         {
           type: "raw",
           value: `
-import { Glimpse } from 'https://esm.sh/zextra/src/components/nav/glimpse/main.js'
+import { Glimpse } from 'https://esm.sh/zextra@latest/src/components/nav/glimpse/main.js'
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-glimpse]').forEach((element) => {
       const serialized_config = element.dataset?.glimpseConfig
       const config = JSON.parse(serialized_config)
-      console.log(config)
-      const ui = Glimpse(config).mount(element)
-      console.log(ui)
+      const { label, ...options} = config
+      Glimpse(options, label).mount(element)
     })
 })
 `,

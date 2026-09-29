@@ -1,6 +1,6 @@
 {
   "name": "rehype-glimpse",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A rehype plugin for embedding interactive Mind Elixir mind maps in Markdown.",
   "keywords": [
     "zikojs",
