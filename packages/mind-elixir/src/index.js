@@ -33,20 +33,16 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
         .map((child) => child.value)
         .join("");
 
-     console.log(value)
-
-
       let config = {};
       let body = null;
 
 
       const documents = splitDocuments(value);
 
-      console.log(documents.length)
-
       if (documents.length === 1) {
         body = parseMindBody(documents[0]);
-      } else {
+      } 
+      else {
         config = parseAllDocuments(documents[0])[0]?.toJSON() || {};
         body = parseMindBody(documents[1]);
       }
@@ -144,7 +140,6 @@ if (document.readyState === 'loading') {
       ],
     };
 
-    // Safely find <head> and <body> if they exist, otherwise fallback to root tree
     let headNode = null;
     let bodyNode = null;
 
@@ -152,20 +147,12 @@ if (document.readyState === 'loading') {
       if (node.tagName === "head") headNode = node;
       if (node.tagName === "body") bodyNode = node;
     });
-
-    // Inject style into <head> (or prepend to root if no head exists)
-    if (headNode) {
-      headNode.children.push(styleNode);
-    } else {
-      tree.children.unshift(styleNode);
-    }
-
-    // Inject script into <body> (or append to root if no body exists)
-    if (bodyNode) {
-      bodyNode.children.push(scriptNode);
-    } else {
-      tree.children.push(scriptNode);
-    }
+    
+    if(headNode)headNode.children.push(styleNode);
+    else tree.children.unshift(styleNode);
+    if(bodyNode) bodyNode.children.push(scriptNode);
+    else tree.children.push(scriptNode);
+    
   };
 };
 

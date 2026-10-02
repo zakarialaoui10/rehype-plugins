@@ -89,6 +89,5 @@ export const parseMindBody = (text) => {
     } catch {}
   }
 
-  // console.log(plainTextToMindNodes(trimmed))
   return plainTextToMindNodes(trimmed)
 }

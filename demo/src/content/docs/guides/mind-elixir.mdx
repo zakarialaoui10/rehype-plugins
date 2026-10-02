@@ -112,24 +112,22 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     You can write your mind maps using different syntaxes inside `mind-elixir` code blocks:
 
     <Tabs>
-      <TabItem label="yaml">
+      <TabItem label="Plain text">
     ````md
     ```mind-elixir
-    topic: ZikoJS Architecture
-    direction: 2
-    tags:
-    - ziko
-    - javascript
-    children:
-    - topic: Core UI Engine
-        tags:
-        - core
+    height : 300px
+    width : 600px
+    direction : 2
+    ---
+    - Root
+      - Node A 
+      - Node B 
     ```
     ````
       </TabItem>
-      <TabItem label="json">
+      <TabItem label="Json">
       </TabItem>
-      <TabItem label="json-like">
+      <TabItem label="Json-like">
       </TabItem>
     </Tabs>
 </Steps>
@@ -137,7 +135,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 ```mind-elixir
 height : 300px
 width : 600px
-direction : 0
+direction : 2
 ---
 - Root
   - Node A [^id1]
