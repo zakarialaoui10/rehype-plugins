@@ -276,8 +276,8 @@ importers:
   packages/mind-elixir:
     dependencies:
       '@zikojs/mind-elixir':
-        specifier: ^0.6.2
-        version: 0.6.2
+        specifier: ^1.0.0-alpha.1
+        version: 1.0.0-alpha.1
       mind-elixir:
         specifier: 6.0.0-next.4
         version: 6.0.0-next.4
@@ -1088,8 +1088,11 @@ packages:
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
 
-  '@zikojs/mind-elixir@0.6.2':
-    resolution: {integrity: sha512-sI2A5f9bGtLxvBiwKaRCXc/XoeSDTFhlBIdRmxJ/PvTB1rFLXzHjukEBILRN7XPWq7JgoeC1sKP/dmLrVYofdg==}
+  '@zikojs/lucide@1.1.0':
+    resolution: {integrity: sha512-WXTTvJ5AatR1GCYsolQEkrZWYbg2udA3TlWWT8eTaKBNzJec/jgm1k+LrX1vDShfKKWKFMfmJ/PjYIXecP+Kpw==}
+
+  '@zikojs/mind-elixir@1.0.0-alpha.1':
+    resolution: {integrity: sha512-l3+hYG5iG+H8YedySs2dBBYiNZnQYT+7a+Jsy/XBUylFSxfg0+4nrdgHQPiPU5c1yYedO+UQSRg5GrwFlziOyw==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2355,6 +2358,10 @@ packages:
     resolution: {integrity: sha512-dkcYmzPR1Zu/+kAAUt8pwtX+lgu83NXFANNBMIr4p/bT8qLS/iC2MisQqE2Smh65gRIt1utqMkVc/bj8IHdOdQ==}
     hasBin: true
 
+  zextra@1.15.2:
+    resolution: {integrity: sha512-yIZPIImCqB1+JoJ/tWiXqn+RKdozMLSA0khZ9aIm0HlBQl7qkrzP12+6pf3/Dpa/uRtjLvaZMtLfEa9H1Mg6QQ==}
+    hasBin: true
+
   ziko-lucide@1.0.2:
     resolution: {integrity: sha512-RfIPhgsfZyh1TrMNE2DThXnWm5O9WNqrQIphhRUHLdqVmQXX4CY0Lu/tWD0KiqAg3Gw1lzXmkdfkxmavN0gRbA==}
 
@@ -2364,6 +2371,9 @@ packages:
 
   ziko@2.0.0-beta.15.1:
     resolution: {integrity: sha512-WYdyQht2yusky497Rrmgike+lNuCpRQzdoGu+mccVZ0iQRhX2boZkHSM3PbcH7l3PSeIm5LelQqlkhZMgL7eCw==}
+
+  ziko@2.0.0-beta.16.0:
+    resolution: {integrity: sha512-KDNtB1olrlP4cZsoTmB3A+Ain3ahHWZw3cmjTPBE0KwXGIV/ZUXYJKMAb4/hxg/omNnIWJrh3ZvxTI2Z9UBKnA==}
 
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
@@ -3059,12 +3069,17 @@ snapshots:
 
   '@ungap/structured-clone@1.4.0': {}
 
-  '@zikojs/mind-elixir@0.6.2':
+  '@zikojs/lucide@1.1.0':
+    dependencies:
+      lucide: 1.48.0
+      ziko: 2.0.0-beta.16.0
+
+  '@zikojs/mind-elixir@1.0.0-alpha.1':
     dependencies:
       mind-elixir: 6.0.0-next.4
       yaml: 2.9.1
-      zextra: 1.15.0
-      ziko: 2.0.0-beta.15.1
+      zextra: 1.15.2
+      ziko: 2.0.0-beta.16.0
 
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:
@@ -4844,6 +4859,12 @@ snapshots:
       ziko: 1.10.0
       ziko-lucide: 1.0.2
 
+  zextra@1.15.2:
+    dependencies:
+      '@zikojs/lucide': 1.1.0
+      ziko: 2.0.0-beta.16.0
+      ziko-lucide: 1.0.2
+
   ziko-lucide@1.0.2:
     dependencies:
       create-vite: 9.2.1
@@ -4853,6 +4874,8 @@ snapshots:
   ziko@1.10.0: {}
 
   ziko@2.0.0-beta.15.1: {}
+
+  ziko@2.0.0-beta.16.0: {}
 
   zod@4.6.5: {}
 

@@ -1,7 +1,7 @@
 import { visit } from "unist-util-visit";
 import { parseAllDocuments } from "yaml";
 
-import { parseMindBody } from "./utils.js";
+import { parseMindBody, splitDocuments } from "./utils.js";
 
 const rehypeMindElixir = ({ useCdn = true } = {}) => {
   return function transformer(tree) {
@@ -33,18 +33,22 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
         .map((child) => child.value)
         .join("");
 
+     console.log(value)
+
+
       let config = {};
       let body = null;
 
-      // Parse multi-document YAML using yaml's parseAllDocuments
-      const yamlDocs = parseAllDocuments(value.trim());
 
-      if (yamlDocs.length === 1) {
-        // If it's a single document, check if parseMindBody can handle it (supports JSON/JS/YAML)
-        body = parseMindBody(yamlDocs[0].toString());
-      } else if (yamlDocs.length >= 2) {
-        config = yamlDocs[0].toJSON() || {};
-        body = parseMindBody(yamlDocs[1].toString());
+      const documents = splitDocuments(value);
+
+      console.log(documents.length)
+
+      if (documents.length === 1) {
+        body = parseMindBody(documents[0]);
+      } else {
+        config = parseAllDocuments(documents[0])[0]?.toJSON() || {};
+        body = parseMindBody(documents[1]);
       }
 
       const serializedBody = JSON.stringify(body, (key, value) => {
@@ -93,7 +97,10 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
         {
           type: "raw",
           value: `
-import { MindMap } from 'https://esm.sh/@zikojs/mind-elixir@latest/src/mind/main.js'
+import { 
+  MindMap,
+  plainTextToMindNodes 
+} from 'https://esm.sh/@zikojs/mind-elixir@latest/src/main.js'
 import { tags } from 'https://esm.sh/ziko@latest/src/dom/tags/index.js'          
 
 function initMindMaps() {
@@ -110,8 +117,12 @@ function initMindMaps() {
     const nodeConfig = config ? JSON.parse(config) : {};
 
     const map = MindMap(
-      { height: '400px', width : '300px', ...nodeConfig },
-      nodeData
+      { 
+      height: '400px', 
+      width : '300px', 
+      data : nodeData,
+      ...nodeConfig 
+      },
     );
 
     tags.div({}, map).style({

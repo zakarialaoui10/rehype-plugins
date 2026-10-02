@@ -1,4 +1,7 @@
-import { yaml2MindElixirData } from '@zikojs/mind-elixir/utils'
+import { 
+  // yaml2MindElixirData,
+  plainTextToMindNodes
+ } from '@zikojs/mind-elixir/utils'
 
 export function escapeHtmlAttribute(value) {
   return value
@@ -14,15 +17,19 @@ export const splitDocuments = (text) => {
   let quote = null
   let escaped = false
 
-  const lines = text.trim().split('\n')
+  const lines = text
+    .replace(/\r\n?/g, '\n')
+    .trim()
+    .split('\n')
 
   for (const line of lines) {
-    const isSeparator = line.match(/^---[ \t]*$/)
+    const isSeparator = /^---[ \t]*$/.test(line)
 
     if (isSeparator && !quote) {
       if (current.trim()) {
         documents.push(current.trim())
       }
+
       current = ''
       continue
     }
@@ -82,6 +89,6 @@ export const parseMindBody = (text) => {
     } catch {}
   }
 
-  // YAML
-  return yaml2MindElixirData(trimmed)
+  // console.log(plainTextToMindNodes(trimmed))
+  return plainTextToMindNodes(trimmed)
 }
