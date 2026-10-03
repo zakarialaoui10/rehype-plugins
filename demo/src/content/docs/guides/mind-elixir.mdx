@@ -134,10 +134,23 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ```mind-elixir
 height : 300px
-width : 600px
+width : 100%
 direction : 2
 ---
-- Root
-  - Node A [^id1]
-  - Node B [^id2]
+- Project Planning
+  - Phase 1: Research [^phase1]
+    - Market Analysis {"color": "#3298db"}
+    - Competitor Study {"color": "#3298db"}
+    - }:2 Research Summary
+  - Phase 2: Development [^phase2]
+    - Frontend {"color": "#2ecc71"}
+    - Backend {"color": "#2ecc71"}
+    - Testing {"color": "#f39c12"}
+    - } Development Summary
+  - Phase 3: Launch [^phase3]
+    - Marketing
+    - Deployment
+  - > [^phase1] >-Leads to-> [^phase2]
+  - > [^phase2] >-Leads to-> [^phase3]
+  
 ```

@@ -1,58 +1,56 @@
 import { visit } from "unist-util-visit";
 import { parseAllDocuments } from "yaml";
 
-import { parseMindBody, splitDocuments } from "./utils.js";
+import { 
+  parseMindBody,
+  splitDocuments 
+} from "./utils.js";
 
 const rehypeMindElixir = ({ useCdn = true } = {}) => {
   return function transformer(tree) {
     let hasElixirMind = false;
 
     visit(tree, "element", (node, index, parent) => {
-      if (node.tagName !== "pre" || !node.children?.length) {
+      if(node.tagName !== "pre" || !node.children?.length) {
         return;
       }
 
       const code = node.children.find(
-        (child) => child.type === "element" && child.tagName === "code",
-      );
-
-      if (!code) return;
-
+        (child) => child.type === "element" && child.tagName === "code");
+      if(!code) return;
       const className = code.properties?.className || [];
       const classes = Array.isArray(className) ? className : [className];
-
-      if (!classes.includes("language-mind-elixir")) {
+      if(!classes.includes("language-mind-elixir")) {
         return;
       }
-
       hasElixirMind = true;
-
-      // Extract the text contained in <code>
       const value = code.children
         .filter((child) => child.type === "text")
         .map((child) => child.value)
         .join("");
 
-      let config = {};
-      let body = null;
-
-
       const documents = splitDocuments(value);
 
-      if (documents.length === 1) {
-        body = parseMindBody(documents[0]);
-      } 
+      let config = {};
+      let bodyText;
+
+      if(documents.length === 1) bodyText = documents[0];
       else {
         config = parseAllDocuments(documents[0])[0]?.toJSON() || {};
-        body = parseMindBody(documents[1]);
+        bodyText = documents[1];
       }
 
-      const serializedBody = JSON.stringify(body, (key, value) => {
-        if (key === "parent") return undefined;
-        return value;
-      });
+      const parsedBody = parseMindBody(bodyText);
 
-      const serializedConfig = JSON.stringify(config);
+      /*
+       * Keep plain text untouched.
+       *
+       * JSON and JSON-like data need serialization because they
+       * are objects at this point.
+       */
+      const serializedBody = parsedBody.type === "plain-text"
+          ? parsedBody.body
+          : JSON.stringify(parsedBody.body);
 
       parent.children[index] = {
         type: "element",
@@ -60,13 +58,14 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
         properties: {
           "data-mind-elixir": "",
           "data-xmind-body": serializedBody,
-          "data-xmind-config": serializedConfig,
+          "data-xmind-type": parsedBody.type,
+          "data-xmind-config": JSON.stringify(config),
         },
         children: [],
       };
     });
 
-    if (!hasElixirMind || !useCdn) {
+    if(!hasElixirMind || !useCdn) {
       return;
     }
 
@@ -93,45 +92,76 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
         {
           type: "raw",
           value: `
-import { 
+import {
   MindMap,
-  plainTextToMindNodes 
-} from 'https://esm.sh/@zikojs/mind-elixir@latest/src/main.js'
-import { tags } from 'https://esm.sh/ziko@latest/src/dom/tags/index.js'          
+  plainTextToMindNodes
+} from 'https://esm.sh/@zikojs/mind-elixir@latest/src/main.js';
+
+import {
+  tags
+} from 'https://esm.sh/ziko@latest/src/dom/tags/index.js';
 
 function initMindMaps() {
-  document.querySelectorAll('[data-mind-elixir]').forEach((element) => {
-    if (element.dataset.rendered) return;
-    
-    const body = element.dataset.xmindBody;
-    const config = element.dataset.xmindConfig;
+  document
+    .querySelectorAll('[data-mind-elixir]')
+    .forEach((element) => {
+      if(element.dataset.rendered) return;
 
-    if (!body) return;
+      const body = element.dataset.xmindBody;
+      const type = element.dataset.xmindType;
+      const config = element.dataset.xmindConfig;
 
-    element.dataset.rendered = "true";
-    const nodeData = JSON.parse(body);
-    const nodeConfig = config ? JSON.parse(config) : {};
+      if(!body) return;
 
-    const map = MindMap(
-      { 
-      height: '400px', 
-      width : '300px', 
-      data : nodeData,
-      ...nodeConfig 
-      },
-    );
+      let nodeData;
 
-    tags.div({}, map).style({
-      display : 'flex',
-      justifyContent: 'center',
-      border : '1px darkblue solid'
-    }).mount(element)
+      switch (type) {
+        case 'json':
+        case 'json-like':
+          nodeData = JSON.parse(body);
+          break;
 
-  });
+        case 'plain-text':
+          nodeData = plainTextToMindNodes(body);
+          break;
+
+        default:
+          console.warn(
+            'Unknown mind-elixir body type:',
+            type
+          );
+          return;
+      }
+
+      const nodeConfig = config
+        ? JSON.parse(config)
+        : {};
+
+      const map = MindMap({
+        height: '400px',
+        width: '300px',
+        data: nodeData,
+        ...nodeConfig,
+      });
+
+      element.dataset.rendered = 'true';
+
+      tags
+        .div({}, map)
+        .style({
+          display: 'flex',
+          justifyContent: 'center',
+          border: '1px darkblue solid',
+        })
+        .mount(element);
+    });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initMindMaps);
+if(document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    initMindMaps
+  );
 } else {
   initMindMaps();
 }
@@ -144,16 +174,16 @@ if (document.readyState === 'loading') {
     let bodyNode = null;
 
     visit(tree, "element", (node) => {
-      if (node.tagName === "head") headNode = node;
-      if (node.tagName === "body") bodyNode = node;
+      if(node.tagName === "head") headNode = node;
+      if(node.tagName === "body") bodyNode = node;
     });
-    
-    if(headNode)headNode.children.push(styleNode);
+
+    if(headNode) headNode.children.push(styleNode);
     else tree.children.unshift(styleNode);
     if(bodyNode) bodyNode.children.push(scriptNode);
     else tree.children.push(scriptNode);
-    
   };
 };
 
 export default rehypeMindElixir;
+

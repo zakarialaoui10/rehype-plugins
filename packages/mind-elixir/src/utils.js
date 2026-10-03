@@ -1,8 +1,3 @@
-import { 
-  // yaml2MindElixirData,
-  plainTextToMindNodes
- } from '@zikojs/mind-elixir/utils'
-
 export function escapeHtmlAttribute(value) {
   return value
     .replace(/&/g, '&amp;')
@@ -72,22 +67,34 @@ export const splitDocuments = (text) => {
 }
 
 export const parseMindBody = (text) => {
-  const trimmed = text.trim()
+  const trimmed = text.trim();
 
   // JSON
   try {
-    return JSON.parse(trimmed)
+    return {
+      type: "json",
+      body: JSON.parse(trimmed),
+    };
   } catch {}
 
-  // JavaScript object/array
+  // JSON-like / JavaScript object or array
   if (
-    trimmed.startsWith('{') ||
-    trimmed.startsWith('[')
+    trimmed.startsWith("{") ||
+    trimmed.startsWith("[")
   ) {
     try {
-      return Function(`"use strict"; return (${trimmed})`)()
+      return {
+        type: "json-like",
+        body: Function(
+          `"use strict"; return (${trimmed})`,
+        )(),
+      };
     } catch {}
   }
 
-  return plainTextToMindNodes(trimmed)
-}
+  // Plain text
+  return {
+    type: "plain-text",
+    body: trimmed,
+  };
+};

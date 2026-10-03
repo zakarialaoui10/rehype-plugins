@@ -1,6 +1,6 @@
 {
   "name": "rehype-mind-elixir",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "A rehype plugin for embedding interactive Mind Elixir mind maps in Markdown.",
   "keywords": [
     "zikojs",
