@@ -6,6 +6,8 @@ import { unified } from '@astrojs/markdown-remark';
 import rehypeMindElixir from 'rehype-mind-elixir';
 import rehypeGlimpse from 'rehype-glimpse';
 
+import vercel from '@astrojs/vercel';
+
 export default defineConfig({
   markdown: {
     processor: unified({
@@ -15,7 +17,7 @@ export default defineConfig({
       ],
     }),
   },
-
+  adapter: vercel(),
   integrations: [
     starlight({
       title: 'Remark plugins',
