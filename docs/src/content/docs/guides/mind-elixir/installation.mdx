@@ -1,8 +1,12 @@
 ---
+
 title: Installation & Setup
+
 description: Install and configure Rehype Mind Elixir with Astro, Next.js, Gatsby, or Unified.
+
 sidebar:
-  order: 2
+order: 2
+
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
@@ -37,9 +41,62 @@ pnpm add rehype-mind-elixir
   </TabItem>
 </Tabs>
 
+## Runtime setup
+
+`rehype-mind-elixir` supports two runtime modes.
+
+<Tabs>
+  <TabItem label="CDN">
+
+By default, `rehype-mind-elixir` loads its client resources from a CDN.
+
+No additional imports are required.
+
+```js
+rehypeMindElixir({
+  useCdn: true,
+});
+```
+
+This automatically injects:
+
+* Mind Elixir's stylesheet
+* The `rehype-mind-elixir` client runtime
+
+An internet connection is required at runtime.
+
+  </TabItem>
+
+  <TabItem label="Local">
+
+To bundle the client resources with your application, disable CDN mode:
+
+```js
+rehypeMindElixir({
+  useCdn: false,
+});
+```
+
+Then import the resources manually:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+Your application's bundler handles these dependencies, so no internet connection is required at runtime.
+
+  </TabItem>
+</Tabs>
+
 ## Astro
 
-Configure the plugin in `astro.config.js`:
+Configure the plugin through Astro's `markdown.rehypePlugins` option.
+
+<Tabs>
+  <TabItem label="CDN">
+
+CDN mode is the default:
 
 ```js
 import { defineConfig } from 'astro/config';
@@ -54,6 +111,49 @@ export default defineConfig({
 });
 ```
 
+You can also explicitly enable it:
+
+```js
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [
+      [rehypeMindElixir, { useCdn: true }],
+    ],
+  },
+});
+```
+
+No manual imports are required.
+
+  </TabItem>
+
+  <TabItem label="Local">
+
+Set `useCdn` to `false`:
+
+```js
+import { defineConfig } from 'astro/config';
+import rehypeMindElixir from 'rehype-mind-elixir';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [
+      [rehypeMindElixir, { useCdn: false }],
+    ],
+  },
+});
+```
+
+Then import the local resources in your application:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+  </TabItem>
+</Tabs>
+
 You can then use `mind-elixir` blocks directly in Markdown:
 
 ````md
@@ -66,10 +166,14 @@ You can then use `mind-elixir` blocks directly in Markdown:
 
 ## Next.js
 
-For Next.js applications using MDX, configure the plugin through `@next/mdx`:
+For Next.js applications using MDX, configure the plugin through `@next/mdx`.
+
+<Tabs>
+  <TabItem label="CDN">
 
 ```js
 // next.config.mjs
+
 import createMDX from '@next/mdx';
 import rehypeMindElixir from 'rehype-mind-elixir';
 
@@ -93,12 +197,58 @@ export default withMDX({
 });
 ```
 
+No manual imports are required.
+
+  </TabItem>
+
+  <TabItem label="Local">
+
+```js
+// next.config.mjs
+
+import createMDX from '@next/mdx';
+import rehypeMindElixir from 'rehype-mind-elixir';
+
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [
+      [rehypeMindElixir, { useCdn: false }],
+    ],
+  },
+});
+
+export default withMDX({
+  pageExtensions: [
+    'js',
+    'jsx',
+    'md',
+    'mdx',
+    'ts',
+    'tsx',
+  ],
+});
+```
+
+Then import the local resources in your application:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+  </TabItem>
+</Tabs>
+
 ## Gatsby
 
-Configure the plugin through `gatsby-plugin-mdx`:
+Configure the plugin through `gatsby-plugin-mdx`.
+
+<Tabs>
+  <TabItem label="CDN">
 
 ```js
 // gatsby-config.js
+
 const rehypeMindElixir = require('rehype-mind-elixir');
 
 module.exports = {
@@ -117,9 +267,49 @@ module.exports = {
 };
 ```
 
+No manual imports are required.
+
+  </TabItem>
+
+  <TabItem label="Local">
+
+```js
+// gatsby-config.js
+
+const rehypeMindElixir = require('rehype-mind-elixir');
+
+module.exports = {
+  plugins: [
+    {
+      resolve: 'gatsby-plugin-mdx',
+      options: {
+        mdxOptions: {
+          rehypePlugins: [
+            [rehypeMindElixir, { useCdn: false }],
+          ],
+        },
+      },
+    },
+  ],
+};
+```
+
+Then import the local resources in your application:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+  </TabItem>
+</Tabs>
+
 ## Unified
 
-`rehype-mind-elixir` can be used directly with Unified:
+`rehype-mind-elixir` can also be used directly with Unified.
+
+<Tabs>
+  <TabItem label="CDN">
 
 ```js
 import { unified } from 'unified';
@@ -138,22 +328,63 @@ const file = await unified()
 console.log(String(file));
 ```
 
+You can explicitly enable CDN mode:
+
+```js
+const file = await unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  .use(rehypeMindElixir, {
+    useCdn: true,
+  })
+  .use(rehypeStringify)
+  .process(markdown);
+```
+
+  </TabItem>
+
+  <TabItem label="Local">
+
+```js
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeMindElixir from 'rehype-mind-elixir';
+import rehypeStringify from 'rehype-stringify';
+
+const file = await unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  .use(rehypeMindElixir, {
+    useCdn: false,
+  })
+  .use(rehypeStringify)
+  .process(markdown);
+
+console.log(String(file));
+```
+
+Then import the local resources in your application:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+  </TabItem>
+</Tabs>
+
 When using Unified directly, `rehype-mind-elixir` should run after `remark-rehype` because it operates on the HAST tree.
 
-## Runtime mode
+## Runtime behavior
 
-By default, the plugin uses CDN resources:
+|                              | `useCdn: true` | `useCdn: false` |
+| ---------------------------- | -------------- | --------------- |
+| Default                      | Yes            | No              |
+| Automatic resource injection | Yes            | No              |
+| CDN resources                | Yes            | No              |
+| Manual imports               | No             | Yes             |
+| Bundled by application       | No             | Yes             |
+| Internet required at runtime | Yes            | No              |
 
-```js
-rehypeMindElixir();
-```
-
-This is equivalent to:
-
-```js
-rehypeMindElixir({
-  useCdn: true,
-});
-```
-
-See [Configuration](/configuration/) for details about CDN and local modes.
+See [Configuration](/configuration/) for the complete `useCdn` documentation and other plugin options.

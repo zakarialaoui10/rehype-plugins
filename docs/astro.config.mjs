@@ -7,6 +7,8 @@ import rehypeMindElixir from 'rehype-mind-elixir';
 import rehypeGlimpse from 'rehype-glimpse';
 
 import vercel from '@astrojs/vercel';
+import starlightThemeMdbook from 'starlight-theme-mdbook';
+
 
 export default defineConfig({
   markdown: {
@@ -20,8 +22,8 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [
     starlight({
-      title: 'Remark plugins',
-
+      title: 'Rehype plugins',
+      plugins: [starlightThemeMdbook()],
       social: [
         {
           icon: 'github',
@@ -40,17 +42,7 @@ export default defineConfig({
               },
             },
           ],
-        },
-        {
-          label: 'Reference',
-          items: [
-            {
-              autogenerate: {
-                directory: 'reference',
-              },
-            },
-          ],
-        },
+        }
       ],
     }),
   ],
