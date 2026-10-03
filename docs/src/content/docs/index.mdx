@@ -1,0 +1,67 @@
+---
+title: Zikojs rehype plugins
+description: A collection of rehype plugins for embedding interactive and structured content in Markdown, built on top of ZikoJS.
+template: splash # Remove or comment out this line to display the site sidebar on this page.
+hero:
+  tagline: A collection of rehype plugins for embedding interactive and structured content in Markdown, built on top of ZikoJS.
+  image:
+    file: https://avatars.githubusercontent.com/u/199463649?s=400&u=3f2feae9f8ffdbeb63b625ecd56c58e2eb65a4a8&v=4
+  actions:
+    - text: Mind Elixir Guide
+      link: /guides/mind-elixir/
+      icon: right-arrow
+    - text: Visit Github repo 
+      link: https://github.com/zakarialaoui10/rehype-plugins
+      icon: external
+      variant: minimal
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+## Plugins
+
+<LinkCard title="Mind Elixir" href="/guides/mind-elixir/" />
+
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Features
+
+<CardGrid stagger>
+  <Card title="Interactive Content" icon="open-book">
+    Embed interactive components directly into Markdown-generated pages.
+  </Card>
+
+  <Card title="Unified Ecosystem" icon="code">
+    Built on the Unified ecosystem and designed to work naturally with Rehype.
+  </Card>
+
+  <Card title="ZikoJS Powered" icon="rocket">
+    Uses ZikoJS for lightweight browser-side rendering.
+  </Card>
+
+  <Card title="Markdown Friendly" icon="document">
+    Use familiar Markdown syntax and fenced code blocks to define structured content.
+  </Card>
+
+  <Card title="Build-time Transformation" icon="hammer">
+    Transform Markdown and HAST nodes into interactive HTML during the processing pipeline.
+  </Card>
+
+  <Card title="Client-side Rendering" icon="laptop">
+    Keep generated HTML lightweight while initializing interactive components in the browser.
+  </Card>
+
+  <Card title="Configurable" icon="setting">
+    Configure plugins to adapt their behavior to different projects and use cases.
+  </Card>
+
+  <Card title="Framework Friendly" icon="globe">
+    Designed to work with Markdown, MDX, Astro, Starlight, and other Unified-based workflows.
+  </Card>
+
+  <Card title="Extensible Collection" icon="puzzle">
+    Supports both Rehype and, where appropriate, Remark plugins for different stages of the Unified pipeline.
+  </Card>
+</CardGrid>
+

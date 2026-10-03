@@ -1,14 +1,13 @@
 packages:
   - "packages/*"
-  - "demo/"
-  - "st/"
+  - "docs/"
 
 allowBuilds:
   esbuild: false
 
 # Define a catalog of version ranges.
 catalog:
-  ziko: ^2.0.0-beta.15.1
+  ziko: latest
   vite: ^8.2.1
   acorn: ^8.18.0
   "@rollup/pluginutils": ^5.4.0
@@ -17,5 +16,5 @@ catalog:
   remark-rehype: latest
 
 minimumReleaseAgeExclude:
-  - ziko@2.0.0-beta.15.1
-  - '@zikojs/mind-elixir@0.6.2 || 0.8.0 || 0.8.1 || 1.0.0-alpha.1'
+  - ziko@2.0.0-beta.16.0
+  - '@zikojs/mind-elixir@1.0.0-alpha.1'
