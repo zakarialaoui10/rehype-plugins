@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-hero class="astro-7l7wvwbn"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>404 | Rehype plugins</title><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.3.5"/><meta name="generator" content="Starlight v0.42.5"/><meta property="og:title" content="404"/><meta property="og:type" content="article"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Rehype plugins"/><meta name="twitter:card" content="summary_large_image"/><script>
+	window.StarlightThemeProvider = (() => {
+		// Each selectable theme maps to a Starlight light/dark mode
+		// (`data-theme`) and an mdBook palette name (`data-mdbook-theme`,
+		// see src/styles/mdbook-theme.css). Rust/Valentine/Caramellatte are
+		// light variants. Dark uses mdBook's `coal` palette.
+		const THEMES = {
+			light: { mode: 'light', palette: 'light' },
+			dark: { mode: 'dark', palette: 'coal' },
+			rust: { mode: 'light', palette: 'rust' },
+			valentine: { mode: 'light', palette: 'valentine' },
+			caramellatte: { mode: 'light', palette: 'caramellatte' },
+		};
+		const THEME_KEY = 'mdbook-theme';
+		const SIDEBAR_KEY = 'mdbook-sidebar';
+
+		function getPreferredColorScheme() {
+			return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+		}
+
+		function getStoredTheme() {
+			try {
+				return localStorage.getItem(THEME_KEY) || 'auto';
+			} catch (e) {
+				return 'auto';
+			}
+		}
+
+		function applyTheme(theme) {
+			// auto or unknown value -> fall back to system preference (light/dark).
+			var def = THEMES[theme] || THEMES[getPreferredColorScheme()];
+			document.documentElement.dataset.theme = def.mode;
+			document.documentElement.dataset.mdbookTheme = def.palette;
+		}
+
+		function setTheme(theme) {
+			applyTheme(theme);
+			try {
+				localStorage.setItem(THEME_KEY, theme === 'auto' ? '' : theme);
+			} catch (e) {}
+		}
+
+		applyTheme(getStoredTheme());
+
+		window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+			if (getStoredTheme() === 'auto') applyTheme('auto');
+		});
+
+		let storedSidebar;
+		try {
+			storedSidebar = localStorage.getItem(SIDEBAR_KEY);
+		} catch (e) {
+			storedSidebar = null;
+		}
+		document.documentElement.dataset.sidebar =
+			storedSidebar || (window.innerWidth >= 1080 ? 'visible' : 'hidden');
+
+		/** Scroll the sidebar's active chapter link into view if it's currently
+		 *  scrolled out of sight, so opening the menu never requires hunting
+		 *  for where you are in a long list. */
+		function scrollActiveLinkIntoView() {
+			const scroller = document.getElementById('starlight__sidebar');
+			const active = scroller && scroller.querySelector('a[aria-current="page"]');
+			if (!scroller || !active) return;
+			const scrollerRect = scroller.getBoundingClientRect();
+			const activeRect = active.getBoundingClientRect();
+			const isVisible = activeRect.top >= scrollerRect.top && activeRect.bottom <= scrollerRect.bottom;
+			if (!isVisible) {
+				active.scrollIntoView({ block: 'center', behavior: 'instant' });
+			}
+		}
+
+		return {
+			setTheme,
+			getStoredTheme,
+			scrollActiveLinkIntoView,
+			toggleSidebar() {
+				const next = document.documentElement.dataset.sidebar === 'hidden' ? 'visible' : 'hidden';
+				document.documentElement.dataset.sidebar = next;
+				try {
+					localStorage.setItem(SIDEBAR_KEY, next);
+				} catch (e) {}
+				if (next === 'visible') scrollActiveLinkIntoView();
+			},
+		};
+	})();
+</script><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/common.COV3M1sP.css"><style>@layer starlight.components{.card:where(.astro-dppid7yg){--sl-card-border:var(--sl-color-purple);--sl-card-bg:var(--sl-color-purple-low);border:1px solid var(--sl-color-gray-5);background-color:var(--sl-color-black);flex-direction:column;gap:clamp(.5rem,.125rem + 1vw,1rem);padding:clamp(1rem,.125rem + 3vw,2.5rem)}.card:where(.astro-dppid7yg):nth-child(4n+1){--sl-card-border:var(--sl-color-orange);--sl-card-bg:var(--sl-color-orange-low)}.card:where(.astro-dppid7yg):nth-child(4n+3){--sl-card-border:var(--sl-color-green);--sl-card-bg:var(--sl-color-green-low)}.card:where(.astro-dppid7yg):nth-child(4n+4){--sl-card-border:var(--sl-color-red);--sl-card-bg:var(--sl-color-red-low)}.card:where(.astro-dppid7yg):nth-child(4n+5){--sl-card-border:var(--sl-color-blue);--sl-card-bg:var(--sl-color-blue-low)}.title:where(.astro-dppid7yg){font-weight:600;font-size:var(--sl-text-h4);color:var(--sl-color-white);line-height:var(--sl-line-height-headings);align-items:center;gap:1rem}.card:where(.astro-dppid7yg) .icon:where(.astro-dppid7yg){border:1px solid var(--sl-card-border);background-color:var(--sl-card-bg);border-radius:.25rem;flex-shrink:0;padding:.2em}.card:where(.astro-dppid7yg) .body:where(.astro-dppid7yg){font-size:clamp(var(--sl-text-sm), calc(.5rem + 1vw), var(--sl-text-body));margin:0}.card-grid:where(.astro-ovlec4hm){grid-template-columns:100%;gap:1rem;display:grid}.card-grid:where(.astro-ovlec4hm)>*{margin-top:0!important}@media (width>=50rem){.card-grid:where(.astro-ovlec4hm){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-ovlec4hm){--stagger-height:5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-ovlec4hm)>:nth-child(2n){transform:translateY(var(--stagger-height))}}.sl-link-card:where(.astro-oe33bcem){border:1px solid var(--sl-color-gray-5);box-shadow:var(--sl-shadow-sm);border-radius:.5rem;grid-template-columns:1fr auto;gap:.5rem;padding:1rem;display:grid;position:relative}a:where(.astro-oe33bcem){line-height:var(--sl-line-height-headings);text-decoration:none}a:where(.astro-oe33bcem):before{content:"";position:absolute;inset:0}.stack:where(.astro-oe33bcem){flex-direction:column;gap:.5rem}.title:where(.astro-oe33bcem){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-oe33bcem){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-oe33bcem){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-oe33bcem):hover{background:var(--sl-color-gray-7,var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-oe33bcem):hover .icon:where(.astro-oe33bcem){color:var(--sl-color-white)}}
+@layer starlight.components{svg:where(.astro-35n2w5oz){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
+@layer starlight.components{starlight-tabs:where(.astro-agsswhd4){display:block}.tablist-wrapper:where(.astro-agsswhd4){overflow-x:auto}:where(.astro-agsswhd4)[role=tablist]{border-bottom:2px solid var(--sl-color-gray-5);padding:0;list-style:none;display:flex}.tab:where(.astro-agsswhd4){display:flex}.tab:where(.astro-agsswhd4)>:where(.astro-agsswhd4)[role=tab]{--sl-tab-color-border:var(--sl-color-gray-5);line-height:var(--sl-line-height-headings);box-shadow:0 2px 0 var(--sl-tab-color-border);color:var(--sl-color-gray-3);outline-offset:var(--sl-outline-offset-inside);overflow-wrap:initial;align-items:center;gap:.5rem;padding:.275rem 1.25rem;text-decoration:none;display:flex}.tab:where(.astro-agsswhd4) :where(.astro-agsswhd4)[role=tab][aria-selected=true]{--sl-tab-color-border:var(--sl-color-text-accent);color:var(--sl-color-white);font-weight:600}.tablist-wrapper:where(.astro-agsswhd4)~[role=tabpanel]{margin-top:1rem}}
+</style><script type="module" src="/_astro/page.Dwipeu-R.js"></script></head><body class="astro-7l7wvwbn"><a class="sl-skip-link astro-c4qg5fy5" href="#_top">Skip to content</a><div class="page sl-flex astro-um4rdyit"><div class="content-column astro-um4rdyit"><header class="header astro-um4rdyit"><div class="mdbook-nav astro-casohkq5"><div class="left-buttons astro-casohkq5"><button id="mdbook-sidebar-toggle" class="icon-button astro-casohkq5" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="starlight__sidebar"><svg aria-hidden="true" class="astro-casohkq5 astro-35n2w5oz" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg></button><div class="theme-select-wrapper astro-kmei5wpn"><button id="mdbook-theme-toggle" class="icon-button astro-kmei5wpn" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list"><svg viewBox="0 0 576 512" width="1em" height="1em" fill="currentColor" aria-hidden="true" class="astro-kmei5wpn"><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z" class="astro-kmei5wpn"></path></svg></button><ul id="mdbook-theme-list" class="theme-popup astro-kmei5wpn" role="menu" aria-label="Themes"><li role="none" class="astro-kmei5wpn"><button role="menuitem" class="theme astro-kmei5wpn" data-theme-value="auto">Auto</button></li><li role="none" class="astro-kmei5wpn"><button role="menuitem" class="theme astro-kmei5wpn" data-theme-value="light">Light</button></li><li role="none" class="astro-kmei5wpn"><button role="menuitem" class="theme astro-kmei5wpn" data-theme-value="dark">Dark</button></li><li role="none" class="astro-kmei5wpn"><button role="menuitem" class="theme astro-kmei5wpn" data-theme-value="rust">Rust</button></li><li role="none" class="astro-kmei5wpn"><button role="menuitem" class="theme astro-kmei5wpn" data-theme-value="valentine">Valentine</button></li><li role="none" class="astro-kmei5wpn"><button role="menuitem" class="theme astro-kmei5wpn" data-theme-value="caramellatte">Caramellatte</button></li></ul></div><script>
+	(function () {
+		function init() {
+			document.querySelectorAll('.theme-select-wrapper').forEach(function (wrapper) {
+				if (wrapper.dataset.bound) return;
+				var toggle = wrapper.querySelector(':scope > button');
+				var popup = wrapper.querySelector(':scope > ul.theme-popup');
+				if (!toggle || !popup) return;
+				wrapper.dataset.bound = '1';
+
+				function isOpen() {
+					return popup.classList.contains('open');
+				}
+				function openPopup() {
+					var current =
+						window.StarlightThemeProvider && window.StarlightThemeProvider.getStoredTheme();
+					popup.querySelectorAll('button.theme').forEach(function (btn) {
+						btn.classList.toggle(
+							'theme-selected',
+							btn.getAttribute('data-theme-value') === current
+						);
+					});
+					popup.classList.add('open');
+					toggle.setAttribute('aria-expanded', 'true');
+				}
+				function closePopup() {
+					popup.classList.remove('open');
+					toggle.setAttribute('aria-expanded', 'false');
+				}
+
+				toggle.addEventListener('click', function (e) {
+					e.stopPropagation();
+					isOpen() ? closePopup() : openPopup();
+				});
+				popup.addEventListener('click', function (e) {
+					var btn = e.target.closest('button.theme');
+					if (!btn) return;
+					if (window.StarlightThemeProvider) {
+						window.StarlightThemeProvider.setTheme(btn.getAttribute('data-theme-value'));
+					}
+					closePopup();
+				});
+			});
+		}
+
+		init();
+		document.addEventListener('astro:page-load', init);
+
+		if (!window.__mdbookThemeDocBound) {
+			window.__mdbookThemeDocBound = true;
+			document.addEventListener('click', function (e) {
+				document.querySelectorAll('.theme-select-wrapper').forEach(function (wrapper) {
+					var popup = wrapper.querySelector(':scope > ul.theme-popup');
+					if (popup && popup.classList.contains('open') && !wrapper.contains(e.target)) {
+						popup.classList.remove('open');
+						var t = wrapper.querySelector(':scope > button');
+						if (t) t.setAttribute('aria-expanded', 'false');
+					}
+				});
+			});
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				document.querySelectorAll('.theme-select-wrapper').forEach(function (wrapper) {
+					var popup = wrapper.querySelector(':scope > ul.theme-popup');
+					if (popup && popup.classList.contains('open')) {
+						popup.classList.remove('open');
+						var t = wrapper.querySelector(':scope > button');
+						if (t) t.focus();
+					}
+				});
+			});
+		}
+	})();
+</script><site-search class="icon-button search-button astro-casohkq5 astro-ththej2q" data-translations="{&quot;placeholder&quot;:&quot;Search&quot;}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-ththej2q"><svg aria-hidden="true" class="astro-ththej2q astro-35n2w5oz" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-ththej2q" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-ththej2q" style="display: none;"><kbd class="astro-ththej2q">Ctrl</kbd><kbd class="astro-ththej2q">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-ththej2q"><div class="dialog-frame sl-flex astro-ththej2q"><button data-close-modal class="sl-flex md:sl-hidden astro-ththej2q">Cancel</button><div class="search-container astro-ththej2q"><div id="starlight__search" class="astro-ththej2q"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.Bumivpjo.js"></script></div><div class="title-wrapper sl-flex astro-casohkq5"><a href="/" class="site-title sl-flex astro-n52zxold"><span class="astro-n52zxold" translate="no">Rehype plugins</span></a></div><div class="right-buttons astro-casohkq5"><button class="icon-button print:hidden astro-casohkq5" type="button" title="Print this book" aria-label="Print this book" onclick="window.print()"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true" class="astro-casohkq5"><path d="M6 2h12a1 1 0 0 1 1 1v5h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1v3a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-3H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm1 2v4h10V4H7Zm0 12v4h10v-4H7Z" class="astro-casohkq5"></path></svg></button><a class="icon-button astro-casohkq5" href="https://github.com/zakarialaoui10/remark-plugins" title="GitHub" aria-label="GitHub"><svg aria-hidden="true" class="astro-casohkq5 astro-35n2w5oz" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div></div><script type="module">document.getElementById(`mdbook-sidebar-toggle`)?.addEventListener(`click`,()=>{window.StarlightThemeProvider?.toggleSidebar()});</script></header><div class="main-frame astro-um4rdyit"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-pxu5owf7"><div class="main-pane astro-pxu5owf7"><main class="astro-7l7wvwbn" lang="en" dir="ltr"><div class="content-panel astro-sqifelv3"><div class="sl-container astro-sqifelv3"><div class="hero astro-ys4en5dd"><div class="sl-flex stack astro-ys4en5dd"><div class="sl-flex copy astro-ys4en5dd"><h1 id="_top" data-page-title class="astro-ys4en5dd">404</h1><div class="tagline astro-ys4en5dd">Page not found. Check the URL or try using the search bar.</div></div></div></div><div class="sl-markdown-content"></div><footer class="sl-flex astro-vqsrgum4"><div class="meta sl-flex astro-vqsrgum4"></div><div class="nav-wide-wrapper print:hidden astro-uay56wwi" dir="ltr"></div><div class="nav-wrapper print:hidden astro-uay56wwi" dir="ltr"><div style="clear: both" class="astro-uay56wwi"></div></div><script type="module">function e(e){let t=e.composedPath()[0]||e.target;return/^(?:input|select|textarea)$/i.test(t?.nodeName??``)}document.addEventListener(`keydown`,t=>{if(t.altKey||t.ctrlKey||t.metaKey||t.shiftKey||document.querySelector(`dialog[open]`)||e(t))return;let n=document.documentElement.dir===`rtl`,r=null;if(t.key===`ArrowRight`?r=n?`.nav-chapters.previous`:`.nav-chapters.next`:t.key===`ArrowLeft`&&(r=n?`.nav-chapters.next`:`.nav-chapters.previous`),!r)return;let i=document.querySelector(r);i&&(t.preventDefault(),window.location.href=i.href)});</script></footer></div></div></main></div></div></div></div></div><script type="module">var e=document.getElementById(`mdbook-sidebar-resize-handle`),t=document.getElementById(`starlight__sidebar`);function n(e){let n=e.clientX-t.getBoundingClientRect().left;if(n<20)document.documentElement.dataset.sidebar=`hidden`;else{document.documentElement.dataset.sidebar===`hidden`&&(document.documentElement.dataset.sidebar=`visible`);let e=Math.min(Math.max(n,150),window.innerWidth-100);document.documentElement.style.setProperty(`--sl-sidebar-width`,e+`px`)}}function r(){document.documentElement.classList.remove(`sidebar-resizing`),window.removeEventListener(`mousemove`,n),window.removeEventListener(`mouseup`,r);try{localStorage.setItem(`mdbook-sidebar`,document.documentElement.dataset.sidebar||`visible`)}catch{}}e?.addEventListener(`mousedown`,()=>{document.documentElement.classList.add(`sidebar-resizing`),window.addEventListener(`mousemove`,n),window.addEventListener(`mouseup`,r)});</script></body></html>
