@@ -1,0 +1,202 @@
+---
+title: Mind Map Syntax
+description: Learn the plain-text, JSON, and JSON-like syntax supported by Rehype Mind Elixir.
+sidebar:
+  order: 3
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+`rehype-mind-elixir` supports three mind-map body formats:
+
+* Plain text
+* JSON
+* JSON-like
+
+An optional YAML configuration section can be placed before the body.
+
+## Plain text
+
+Plain text is the simplest way to create a mind map.
+
+Use indentation to represent parent-child relationships:
+
+````md
+```mind-elixir
+- ZikoJS
+  - Core
+    - UIElement
+    - Hooks
+    - Router
+  - Addons
+    - Mind Elixir
+    - Three.js
+    - Chart.js
+```
+````
+
+This creates a tree structure:
+
+```text
+ZikoJS
+├── Core
+│   ├── UIElement
+│   ├── Hooks
+│   └── Router
+└── Addons
+    ├── Mind Elixir
+    ├── Three.js
+    └── Chart.js
+```
+
+## JSON
+
+Mind Elixir data can be provided as JSON:
+
+````md
+```mind-elixir
+{
+  "nodeData": {
+    "id": "root",
+    "topic": "ZikoJS",
+    "root": true,
+    "children": [
+      {
+        "id": "core",
+        "topic": "Core"
+      },
+      {
+        "id": "addons",
+        "topic": "Addons"
+      }
+    ]
+  }
+}
+```
+````
+
+JSON is useful when the data comes from an existing Mind Elixir export or is generated programmatically.
+
+## JSON-like
+
+JSON-like syntax accepts JavaScript-style object and array notation:
+
+````md
+```mind-elixir
+{
+  nodeData: {
+    id: "root",
+    topic: "ZikoJS",
+    root: true,
+    children: [
+      {
+        id: "core",
+        topic: "Core"
+      },
+      {
+        id: "addons",
+        topic: "Addons"
+      }
+    ]
+  }
+}
+```
+````
+
+Unlike strict JSON, property names can be unquoted.
+
+## Configuration
+
+An optional configuration section can be placed before the mind-map body.
+
+Separate the configuration and body with `---`:
+
+````md
+```mind-elixir
+height : 500px
+width : 100%
+direction : 2
+---
+- ZikoJS
+  - Core
+  - Addons
+  - Integrations
+```
+````
+
+The section before `---` is YAML configuration.
+
+The section after `---` is the mind-map body.
+
+> YAML is supported for configuration only. It is not supported as a mind-map body format.
+
+If no configuration is needed, the separator can be omitted:
+
+````md
+```mind-elixir
+- Root
+  - Node A
+  - Node B
+```
+````
+
+## Node properties
+
+Plain-text nodes can include Mind Elixir properties using JSON-like syntax:
+
+````md
+```mind-elixir
+- ZikoJS
+  - Core {"color": "#3498db"}
+  - Addons {"border": "2px red solid"}
+```
+````
+
+Properties are applied to the corresponding Mind Elixir node.
+
+Multiple properties can be specified:
+
+````md
+```mind-elixir
+- ZikoJS
+  - Core {"color": "#3498db", "fontSize": "20px"}
+  - Addons {"border": "2px red solid"}
+  - Integrations {"background": "#f5f5f5"}
+```
+````
+
+## Combining everything
+
+The following example combines configuration, plain-text syntax, and node properties:
+
+````md
+```mind-elixir
+height : 500px
+width : 100%
+direction : 2
+---
+- ZikoJS Ecosystem
+  - Core {"color": "#3498db"}
+    - UIElement
+    - Hooks
+    - Router
+  - Server
+  - Addons
+    - Mind Elixir {"border": "2px red solid"}
+    - Three.js
+    - Chart.js
+  - Integrations
+    - Astro
+    - React
+    - Vue
+```
+````
+
+## Format comparison
+
+| Format     | Description                                    |
+| ---------- | ---------------------------------------------- |
+| Plain text | Tree-oriented syntax for writing maps directly |
+| JSON       | Standard JSON Mind Elixir data                 |
+| JSON-like  | JavaScript-style objects and arrays            |
+| YAML       | Configuration only                             |

@@ -1,0 +1,213 @@
+---
+title: Configuration
+description: Configure Rehype Mind Elixir and control how its client resources are loaded.
+sidebar:
+    order: 5
+----
+
+## Options
+
+`rehype-mind-elixir` accepts an options object when configuring the plugin.
+
+### `useCdn`
+
+Controls whether the plugin automatically loads the required client resources from a CDN.
+
+```ts
+type Options = {
+  useCdn?: boolean;
+};
+```
+
+The default value is:
+
+```js
+true
+```
+
+## CDN mode
+
+With the default configuration:
+
+```js
+rehypeMindElixir();
+```
+
+or explicitly:
+
+```js
+rehypeMindElixir({
+  useCdn: true,
+});
+```
+
+the plugin automatically injects:
+
+* Mind Elixir's stylesheet
+* The `rehype-mind-elixir` client runtime
+
+This makes setup simple because no manual imports are required.
+
+However, the generated page loads these resources from a CDN, so an internet connection is required at runtime.
+
+## Local mode
+
+To avoid CDN resources:
+
+```js
+rehypeMindElixir({
+  useCdn: false,
+});
+```
+
+In this mode, the plugin does not inject the stylesheet or client runtime.
+
+Import them manually:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+Your application's bundler handles these dependencies.
+
+No internet connection is required at runtime.
+
+## Comparison
+
+|                              | `useCdn: true` | `useCdn: false` |
+| ---------------------------- | -------------- | --------------- |
+| Default                      | Yes            | No              |
+| Automatic resource loading   | Yes            | No              |
+| CDN                          | Yes            | No              |
+| Manual imports               | No             | Yes             |
+| Bundled by application       | No             | Yes             |
+| Internet required at runtime | Yes            | No              |
+
+## Configuration in Astro
+
+For CDN mode:
+
+```js
+import { defineConfig } from 'astro/config';
+import rehypeMindElixir from 'rehype-mind-elixir';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [
+      rehypeMindElixir(),
+    ],
+  },
+});
+```
+
+For local mode:
+
+```js
+import { defineConfig } from 'astro/config';
+import rehypeMindElixir from 'rehype-mind-elixir';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [
+      rehypeMindElixir({
+        useCdn: false,
+      }),
+    ],
+  },
+});
+```
+
+Then import the local resources in your application:
+
+```js
+import 'mind-elixir/style';
+import 'rehype-mind-elixir/client';
+```
+
+## Mind-map configuration
+
+Mind-map-specific options can be provided inside the `mind-elixir` block.
+
+The configuration section uses YAML:
+
+````md
+```mind-elixir
+height : 500px
+width : 100%
+direction : 2
+---
+- ZikoJS
+  - Core
+  - Addons
+```
+````
+
+The configuration is passed to the Mind Elixir map.
+
+## Configuration and body
+
+The two sections have different purposes:
+
+```text
+┌─────────────────────────────┐
+│ YAML configuration          │
+│                             │
+│ height : 500px              │
+│ width : 100%                │
+│ direction : 2               │
+├─────────────────────────────┤
+│ ---                         │
+├─────────────────────────────┤
+│ Mind-map body               │
+│                             │
+│ - ZikoJS                    │
+│   - Core                    │
+│   - Addons                  │
+└─────────────────────────────┘
+```
+
+The configuration section uses YAML, while the body supports:
+
+* Plain text
+* JSON
+* JSON-like
+
+## Data attributes
+
+The plugin uses data attributes to transfer the processed map data to the client runtime.
+
+A generated container has the following structure:
+
+```html
+<div
+  data-mind-elixir
+  data-xmind-type="plain-text"
+  data-xmind-body="..."
+  data-xmind-config="..."
+></div>
+```
+
+### `data-mind-elixir`
+
+Marks the element as a Mind Elixir container.
+
+### `data-xmind-type`
+
+Specifies the body format:
+
+```text
+plain-text
+json
+json-like
+```
+
+### `data-xmind-body`
+
+Contains the serialized mind-map body.
+
+### `data-xmind-config`
+
+Contains the serialized configuration.
+
+These attributes are an implementation detail used by `rehype-mind-elixir/client`.

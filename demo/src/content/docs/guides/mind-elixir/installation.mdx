@@ -1,0 +1,159 @@
+---
+title: Installation & Setup
+description: Install and configure Rehype Mind Elixir with Astro, Next.js, Gatsby, or Unified.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Installation
+
+Install `rehype-mind-elixir` using your preferred package manager.
+
+<Tabs>
+  <TabItem label="npm">
+
+```bash
+npm install rehype-mind-elixir
+```
+
+  </TabItem>
+
+  <TabItem label="Yarn">
+
+```bash
+yarn add rehype-mind-elixir
+```
+
+  </TabItem>
+
+  <TabItem label="pnpm">
+
+```bash
+pnpm add rehype-mind-elixir
+```
+
+  </TabItem>
+</Tabs>
+
+## Astro
+
+Configure the plugin in `astro.config.js`:
+
+```js
+import { defineConfig } from 'astro/config';
+import rehypeMindElixir from 'rehype-mind-elixir';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [
+      rehypeMindElixir,
+    ],
+  },
+});
+```
+
+You can then use `mind-elixir` blocks directly in Markdown:
+
+````md
+```mind-elixir
+- ZikoJS
+  - Core
+  - Addons
+```
+````
+
+## Next.js
+
+For Next.js applications using MDX, configure the plugin through `@next/mdx`:
+
+```js
+// next.config.mjs
+import createMDX from '@next/mdx';
+import rehypeMindElixir from 'rehype-mind-elixir';
+
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [
+      rehypeMindElixir,
+    ],
+  },
+});
+
+export default withMDX({
+  pageExtensions: [
+    'js',
+    'jsx',
+    'md',
+    'mdx',
+    'ts',
+    'tsx',
+  ],
+});
+```
+
+## Gatsby
+
+Configure the plugin through `gatsby-plugin-mdx`:
+
+```js
+// gatsby-config.js
+const rehypeMindElixir = require('rehype-mind-elixir');
+
+module.exports = {
+  plugins: [
+    {
+      resolve: 'gatsby-plugin-mdx',
+      options: {
+        mdxOptions: {
+          rehypePlugins: [
+            rehypeMindElixir,
+          ],
+        },
+      },
+    },
+  ],
+};
+```
+
+## Unified
+
+`rehype-mind-elixir` can be used directly with Unified:
+
+```js
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeMindElixir from 'rehype-mind-elixir';
+import rehypeStringify from 'rehype-stringify';
+
+const file = await unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  .use(rehypeMindElixir)
+  .use(rehypeStringify)
+  .process(markdown);
+
+console.log(String(file));
+```
+
+When using Unified directly, `rehype-mind-elixir` should run after `remark-rehype` because it operates on the HAST tree.
+
+## Runtime mode
+
+By default, the plugin uses CDN resources:
+
+```js
+rehypeMindElixir();
+```
+
+This is equivalent to:
+
+```js
+rehypeMindElixir({
+  useCdn: true,
+});
+```
+
+See [Configuration](/configuration/) for details about CDN and local modes.

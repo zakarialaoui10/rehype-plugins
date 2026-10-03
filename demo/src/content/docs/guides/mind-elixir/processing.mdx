@@ -1,0 +1,239 @@
+---
+title: Processing
+description: Understand how Rehype Mind Elixir transforms mind-elixir blocks into interactive Mind Elixir maps.
+sidebar:
+  order: 4
+---
+
+`rehype-mind-elixir` integrates into the Unified processing pipeline as a Rehype plugin.
+
+It transforms `mind-elixir` fenced code blocks into containers that are initialized by the client runtime.
+
+## Processing pipeline
+
+A typical pipeline looks like this:
+
+````text
+```mind-elixir
+- ZikoJS
+  - Core
+  - Addons
+````
+
+```
+    │
+    ▼
+```
+
+remark-parse
+│
+▼
+MDAST
+│
+▼
+remark-rehype
+│
+▼
+HAST
+│
+▼
+rehype-mind-elixir
+│
+├── Find mind-elixir code blocks
+│
+├── Split configuration and body
+│
+├── Parse YAML configuration
+│
+├── Detect body format
+│
+└── Generate Mind Elixir container
+│
+▼
+rehype-stringify
+│
+▼
+HTML
+│
+▼
+rehype-mind-elixir/client
+│
+├── Plain text
+│      ↓
+│  plainTextToMindNodes()
+│
+├── JSON
+│      ↓
+│  JSON.parse()
+│
+└── JSON-like
+↓
+JSON.parse()
+│
+▼
+Mind Elixir
+│
+▼
+Interactive Mind Map
+
+`````
+
+## 1. Markdown
+
+The process starts with a `mind-elixir` fenced code block:
+
+````md
+```mind-elixir
+- ZikoJS
+  - Core
+  - Addons
+`````
+
+````
+
+At this point, it is simply Markdown source.
+
+## 2. Markdown parsing
+
+`remark-parse` converts the Markdown into a Markdown AST (MDAST).
+
+The fenced code block becomes a code node containing:
+
+- Language: `mind-elixir`
+- Value: the contents of the code block
+
+## 3. HAST conversion
+
+`remark-rehype` converts the MDAST into a Hypertext AST (HAST).
+
+The code block becomes a structure similar to:
+
+```html
+<pre>
+  <code class="language-mind-elixir">
+    ...
+  </code>
+</pre>
+```
+
+## 4. Rehype Mind Elixir
+
+`rehype-mind-elixir` searches the HAST tree for:
+
+```html
+<code class="language-mind-elixir">
+```
+
+It extracts the contents and separates the optional configuration from the mind-map body.
+
+### Configuration
+
+If `---` is present, the first section is parsed as YAML.
+
+```text
+height : 500px
+width : 100%
+direction : 2
+```
+
+### Body detection
+
+The remaining body is passed to the body parser.
+
+The parser identifies it as:
+
+- `plain-text`
+- `json`
+- `json-like`
+
+The original body is preserved appropriately for the client runtime.
+
+## 5. Generated container
+
+The original `<pre>` element is replaced with a container:
+
+```html
+<div
+  data-mind-elixir
+  data-xmind-type="plain-text"
+  data-xmind-body="..."
+  data-xmind-config="..."
+></div>
+```
+
+The data attributes allow the client runtime to initialize the map without embedding JavaScript inside every generated element.
+
+## 6. HTML generation
+
+`rehype-stringify` converts the resulting HAST tree into HTML.
+
+The generated HTML can then be served to the browser.
+
+## 7. Client runtime
+
+`rehype-mind-elixir/client` finds containers marked with:
+
+```html
+data-mind-elixir
+```
+
+It reads:
+
+- `data-xmind-body`
+- `data-xmind-type`
+- `data-xmind-config`
+
+The body type determines how the data is converted into Mind Elixir data.
+
+### Plain text
+
+Plain-text data is converted using:
+
+```js
+plainTextToMindNodes(body);
+```
+
+### JSON
+
+JSON data is parsed using:
+
+```js
+JSON.parse(body);
+```
+
+### JSON-like
+
+JSON-like data is parsed into the corresponding Mind Elixir data structure before creating the map.
+
+## 8. Mind Elixir
+
+Finally, the client creates the interactive map using the Mind Elixir integration.
+
+The result is an interactive Mind Elixir mind map embedded in the generated page.
+
+## Why the processing is split
+
+The plugin and client have separate responsibilities.
+
+### `rehype-mind-elixir`
+
+Runs during Markdown processing and is responsible for:
+
+- Finding `mind-elixir` blocks
+- Splitting configuration and body
+- Parsing configuration
+- Detecting the body format
+- Generating the HTML container
+- Optionally injecting the CDN resources
+
+### `rehype-mind-elixir/client`
+
+Runs in the browser and is responsible for:
+
+- Finding generated containers
+- Parsing their data
+- Creating Mind Elixir maps
+- Initializing the interactive UI
+
+This separation keeps the Rehype transformation independent from browser-side rendering.
+````

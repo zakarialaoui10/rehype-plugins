@@ -1,0 +1,84 @@
+---
+title: Overview
+description: Render interactive Mind Elixir mind maps directly in Markdown and MDX.
+sidebar:
+    order: 1
+--------
+
+`rehype-mind-elixir` is a [Rehype](https://github.com/remarkjs/rehype) plugin that lets you embed interactive [Mind Elixir](https://github.com/SSShooter/mind-elixir-core) mind maps directly in Markdown and MDX.
+
+Instead of writing JavaScript to create a mind map, you can describe it using a `mind-elixir` fenced code block.
+
+## Example
+
+````md
+```mind-elixir
+height : 400px
+width : 100%
+---
+- ZikoJS
+  - Core
+  - Addons
+  - Integrations
+```
+````
+
+The code block is transformed into an interactive Mind Elixir map.
+
+```mind-elixir
+height : 400px
+width : 100%
+---
+- ZikoJS
+  - Core
+  - Addons
+  - Integrations
+```
+
+
+## Features
+
+* Plain-text mind-map syntax
+* JSON mind-map data
+* JSON-like syntax
+* YAML configuration
+* Mind Elixir node properties
+* CDN or locally bundled runtime
+* Works with Unified and unified-based frameworks
+
+## Supported body formats
+
+The mind-map body supports:
+
+* **Plain text** — write a tree directly in Markdown.
+* **JSON** — use existing or generated Mind Elixir data.
+* **JSON-like** — use JavaScript-style objects and arrays.
+
+YAML is used for the optional configuration section, not for the mind-map body.
+
+## How it works
+
+```text
+mind-elixir
+    │
+    ▼
+Markdown / MDX
+    │
+    ▼
+Rehype
+    │
+    ▼
+rehype-mind-elixir
+    │
+    ▼
+Interactive Mind Elixir map
+```
+
+See [Processing](/processing/) for the complete processing pipeline.
+
+## Next steps
+
+* [Installation & Setup](/installation/) — Install and configure the plugin.
+* [Mind Map Syntax](/syntax/) — Learn the supported mind-map formats.
+* [Processing](/processing/) — Understand how the plugin works.
+* [Configuration](/configuration/) — Configure the plugin and runtime.
