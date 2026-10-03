@@ -1,82 +1,73 @@
 ---
+
 title: Processing
 description: Understand how Rehype Mind Elixir transforms mind-elixir blocks into interactive Mind Elixir maps.
 sidebar:
-  order: 4
----
+order: 4
+--------
+
+# Processing
 
 `rehype-mind-elixir` integrates into the Unified processing pipeline as a Rehype plugin.
 
-It transforms `mind-elixir` fenced code blocks into containers that are initialized by the client runtime.
+It transforms `mind-elixir` fenced code blocks into HTML containers. The client runtime then finds these containers and renders the corresponding Mind Elixir maps.
 
 ## Processing pipeline
 
 A typical pipeline looks like this:
 
 ````text
-```mind-elixir
-- ZikoJS
-  - Core
-  - Addons
+Source Markdown
+
+    ```mind-elixir
+    - ZikoJS
+      - Core
+      - Addons
+    ```
+
+            │
+            ▼
+       remark-parse
+            │
+            ▼
+          MDAST
+            │
+            ▼
+       remark-rehype
+            │
+            ▼
+           HAST
+            │
+            ▼
+    rehype-mind-elixir
+            │
+            ├── Find mind-elixir code blocks
+            ├── Split configuration and body
+            ├── Parse YAML configuration
+            ├── Detect body format
+            └── Generate Mind Elixir container
+            │
+            ▼
+      rehype-stringify
+            │
+            ▼
+           HTML
+            │
+            ▼
+    rehype-mind-elixir/client
+            │
+            ├── Find generated containers
+            ├── Read body, type, and configuration
+            ├── Parse the body
+            ├── Create the Mind Elixir map
+            └── Mount the map
+            │
+            ▼
+        Mind Elixir
+            │
+            ▼
+     Interactive Mind Map
 ````
-
-```
-    │
-    ▼
-```
-
-remark-parse
-│
-▼
-MDAST
-│
-▼
-remark-rehype
-│
-▼
-HAST
-│
-▼
-rehype-mind-elixir
-│
-├── Find mind-elixir code blocks
-│
-├── Split configuration and body
-│
-├── Parse YAML configuration
-│
-├── Detect body format
-│
-└── Generate Mind Elixir container
-│
-▼
-rehype-stringify
-│
-▼
-HTML
-│
-▼
-rehype-mind-elixir/client
-│
-├── Plain text
-│      ↓
-│  plainTextToMindNodes()
-│
-├── JSON
-│      ↓
-│  JSON.parse()
-│
-└── JSON-like
-↓
-JSON.parse()
-│
-▼
-Mind Elixir
-│
-▼
-Interactive Mind Map
-
-`````
 
 ## 1. Markdown
 
@@ -87,8 +78,7 @@ The process starts with a `mind-elixir` fenced code block:
 - ZikoJS
   - Core
   - Addons
-`````
-
+```
 ````
 
 At this point, it is simply Markdown source.
@@ -99,8 +89,8 @@ At this point, it is simply Markdown source.
 
 The fenced code block becomes a code node containing:
 
-- Language: `mind-elixir`
-- Value: the contents of the code block
+* Language: `mind-elixir`
+* Value: the contents of the code block
 
 ## 3. HAST conversion
 
@@ -124,29 +114,37 @@ The code block becomes a structure similar to:
 <code class="language-mind-elixir">
 ```
 
-It extracts the contents and separates the optional configuration from the mind-map body.
+When a matching code block is found, the plugin:
+
+1. Extracts the code block contents.
+2. Splits the optional configuration from the body.
+3. Parses the configuration as YAML.
+4. Detects the body format.
+5. Generates a Mind Elixir container.
 
 ### Configuration
 
 If `---` is present, the first section is parsed as YAML.
 
-```text
-height : 500px
-width : 100%
-direction : 2
+```yaml
+height: 500px
+width: 100%
+direction: 2
 ```
+
+The configuration is optional. Without it, an empty configuration object is generated.
 
 ### Body detection
 
 The remaining body is passed to the body parser.
 
-The parser identifies it as:
+The parser identifies it as one of:
 
-- `plain-text`
-- `json`
-- `json-like`
+* `plain-text`
+* `json`
+* `json-like`
 
-The original body is preserved appropriately for the client runtime.
+The body is serialized according to its type so that the client runtime can process it correctly.
 
 ## 5. Generated container
 
@@ -161,79 +159,218 @@ The original `<pre>` element is replaced with a container:
 ></div>
 ```
 
-The data attributes allow the client runtime to initialize the map without embedding JavaScript inside every generated element.
+The plugin does not create the interactive map at this stage.
+
+Instead, it stores the information required by the browser runtime in `data-*` attributes.
+
+This keeps the Rehype transformation independent from the browser-side rendering logic.
 
 ## 6. HTML generation
 
 `rehype-stringify` converts the resulting HAST tree into HTML.
 
-The generated HTML can then be served to the browser.
+The generated HTML contains the Mind Elixir containers but does not yet contain the rendered mind maps.
+
+For example:
+
+```html
+<div
+  data-mind-elixir
+  data-xmind-type="plain-text"
+  data-xmind-body="- ZikoJS\n  - Core\n  - Addons"
+  data-xmind-config="{}"
+></div>
+```
 
 ## 7. Client runtime
 
-`rehype-mind-elixir/client` finds containers marked with:
+The browser runtime is provided by:
 
-```html
-data-mind-elixir
+```js
+import "rehype-mind-elixir/client";
 ```
 
-It reads:
+The runtime searches the document for elements matching:
 
-- `data-xmind-body`
-- `data-xmind-type`
-- `data-xmind-config`
+```css
+[data-mind-elixir]
+```
 
-The body type determines how the data is converted into Mind Elixir data.
+It then initializes every container that has not already been rendered.
+
+### Reading the data
+
+For each container, the runtime reads:
+
+```js
+const body = element.dataset.xmindBody;
+const type = element.dataset.xmindType;
+const config = element.dataset.xmindConfig;
+```
+
+These values correspond to the attributes generated by `rehype-mind-elixir`.
+
+## 8. Parsing the body
+
+The `data-xmind-type` attribute determines how the body is converted into Mind Elixir node data.
 
 ### Plain text
 
-Plain-text data is converted using:
+Plain-text maps are converted using `plainTextToMindNodes()` from `@zikojs/mind-elixir/no-css`:
 
 ```js
-plainTextToMindNodes(body);
+nodeData = plainTextToMindNodes(body);
 ```
+
+For example:
+
+```text
+- ZikoJS
+  - Core
+  - Addons
+```
+
+is converted into the corresponding Mind Elixir node structure.
 
 ### JSON
 
-JSON data is parsed using:
+JSON bodies are parsed with:
 
 ```js
-JSON.parse(body);
+nodeData = JSON.parse(body);
 ```
 
 ### JSON-like
 
-JSON-like data is parsed into the corresponding Mind Elixir data structure before creating the map.
+JSON-like bodies are also parsed from their serialized representation:
 
-## 8. Mind Elixir
+```js
+nodeData = JSON.parse(body);
+```
 
-Finally, the client creates the interactive map using the Mind Elixir integration.
+The result is the Mind Elixir node data passed to the map constructor.
 
-The result is an interactive Mind Elixir mind map embedded in the generated page.
+## 9. Parsing configuration
+
+If configuration data is present, the runtime parses it from `data-xmind-config`:
+
+```js
+const nodeConfig = config
+  ? JSON.parse(config)
+  : {};
+```
+
+The configuration is then combined with the default rendering options:
+
+```js
+const map = MindMap({
+  height: '400px',
+  width: '300px',
+  data: nodeData,
+  ...nodeConfig,
+});
+```
+
+User-provided configuration therefore overrides the default `height` and `width` values when those properties are specified.
+
+## 10. Creating the Mind Elixir map
+
+The client runtime imports `MindMap` from:
+
+```js
+import {
+  MindMap,
+  plainTextToMindNodes,
+} from '@zikojs/mind-elixir/no-css';
+```
+
+The parsed node data and configuration are passed to `MindMap()`:
+
+```js
+const map = MindMap({
+  height: '400px',
+  width: '300px',
+  data: nodeData,
+  ...nodeConfig,
+});
+```
+
+`MindMap()` creates the interactive Mind Elixir map.
+
+## 11. Mounting the map
+
+The generated map is wrapped using ZikoJS:
+
+```js
+tags
+  .div({}, map)
+  .style({
+    display: 'flex',
+    justifyContent: 'center',
+    border: '1px darkblue solid',
+  })
+  .mount(element);
+```
+
+This creates a ZikoJS `<div>` containing the Mind Elixir map and mounts it into the generated container.
+
+The final structure is therefore roughly:
+
+```text
+Generated container
+        │
+        ▼
+    ZikoJS <div>
+        │
+        ▼
+    MindMap(...)
+        │
+        ▼
+ Interactive Mind Elixir map
+```
+
+## 12. Preventing duplicate rendering
+
+After a container has been initialized, the runtime marks it as rendered:
+
+```js
+element.dataset.rendered = 'true';
+```
+
+Before rendering a container, the runtime checks:
+
+```js
+if (element.dataset.rendered) return;
+```
+
+This prevents the same container from being initialized multiple times.
 
 ## Why the processing is split
 
-The plugin and client have separate responsibilities.
+The plugin and client runtime have separate responsibilities.
 
 ### `rehype-mind-elixir`
 
 Runs during Markdown processing and is responsible for:
 
-- Finding `mind-elixir` blocks
-- Splitting configuration and body
-- Parsing configuration
-- Detecting the body format
-- Generating the HTML container
-- Optionally injecting the CDN resources
+* Finding `mind-elixir` blocks
+* Extracting their contents
+* Splitting configuration and body
+* Parsing YAML configuration
+* Detecting the body format
+* Generating the HTML container
+* Optionally injecting CDN resources
 
 ### `rehype-mind-elixir/client`
 
 Runs in the browser and is responsible for:
 
-- Finding generated containers
-- Parsing their data
-- Creating Mind Elixir maps
-- Initializing the interactive UI
+* Finding generated containers
+* Reading the `data-*` attributes
+* Parsing plain-text, JSON, and JSON-like bodies
+* Parsing the configuration
+* Creating the Mind Elixir map
+* Wrapping and mounting the map with ZikoJS
+* Preventing duplicate rendering
 
-This separation keeps the Rehype transformation independent from browser-side rendering.
-````
+This separation keeps the Rehype transformation focused on document processing while the client runtime handles browser-side rendering and interactivity.

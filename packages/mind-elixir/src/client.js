@@ -7,10 +7,7 @@ import {
   tags
 } from 'ziko/dom';
 
-console.log('Rehype Mind Elixir Client ...')
-
 function initMindMaps() {
-  console.log('Rehype Mind Elixir Client ... Init ...')
   document
     .querySelectorAll('[data-mind-elixir]')
     .forEach((element) => {
