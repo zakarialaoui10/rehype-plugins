@@ -8,12 +8,16 @@ allowBuilds:
 # Define a catalog of version ranges.
 catalog:
   ziko: latest
+  hast-util-to-string : latest
+  unist-util-visit : latest
+  yaml : latest
   vite: ^8.2.1
   acorn: ^8.18.0
   "@rollup/pluginutils": ^5.4.0
   unified: latest
   remark-parse: latest
   remark-rehype: latest
+  vitest : latest
 
 minimumReleaseAgeExclude:
   - ziko@2.0.0-beta.16.0

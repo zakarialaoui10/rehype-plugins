@@ -28,7 +28,8 @@ const getMindMaps = (tree) =>
       node.type === 'element' &&
       node.tagName === 'div' &&
       node.properties &&
-      'data-mind-elixir' in node.properties
+      ('dataMindElixir' in node.properties ||
+        'data-mind-elixir' in node.properties)
   )
 
 describe('rehypeMindElixir', () => {
@@ -42,9 +43,9 @@ describe('rehypeMindElixir', () => {
     const mindMap = mindMaps[0]
 
     expect(mindMap.tagName).toBe('div')
-    expect(mindMap.properties).toHaveProperty('data-mind-elixir')
-    expect(mindMap.properties).toHaveProperty('data-xmind-body')
-    expect(mindMap.properties).toHaveProperty('data-xmind-config')
+    expect(mindMap.properties).toHaveProperty('dataMindElixir')
+    expect(mindMap.properties).toHaveProperty('dataXmindBody')
+    expect(mindMap.properties).toHaveProperty('dataXmindConfig')
   })
 
   it('does not transform other code blocks', () => {
@@ -93,15 +94,15 @@ children:
 
     const mindMap = mindMaps[0]
 
-    expect(mindMap.properties).toHaveProperty('data-xmind-body')
-    expect(mindMap.properties).toHaveProperty('data-xmind-config')
+    expect(mindMap.properties).toHaveProperty('dataXmindBody')
+    expect(mindMap.properties).toHaveProperty('dataXmindConfig')
 
     expect(
-      mindMap.properties['data-xmind-config']
+      mindMap.properties.dataXmindConfig
     ).toContain('direction')
 
     expect(
-      mindMap.properties['data-xmind-config']
+      mindMap.properties.dataXmindConfig
     ).toContain('600px')
   })
 
@@ -112,7 +113,7 @@ children:
 
     expect(mindMap).toBeDefined()
 
-    const body = mindMap.properties['data-xmind-body']
+    const body = mindMap.properties.dataXmindBody
 
     expect(body).toBeDefined()
     expect(body).not.toContain('parent')
@@ -126,32 +127,35 @@ children:
     const styleNode = tree.children.find(
       node =>
         node.type === 'element' &&
-        node.tagName === 'style' &&
-        node.children.some(
-          child =>
-            child.type === 'text' &&
-            child.value.includes('mind-elixir/style')
-        )
+        node.tagName === 'link' &&
+        node.properties?.rel?.includes('stylesheet') &&
+        node.properties?.href === 'https://esm.sh/mind-elixir/style'
     )
 
     const scriptNode = tree.children.find(
       node =>
         node.type === 'element' &&
         node.tagName === 'script' &&
-        node.children.some(
-          child =>
-            child.type === 'text' &&
-            child.value.includes('@zikojs/mind-elixir')
-        )
+        node.properties?.src ===
+          'https://esm.sh/rehype-mind-elixir@latest/client'
     )
 
     expect(styleNode).toBeDefined()
     expect(scriptNode).toBeDefined()
 
+    expect(styleNode.properties.rel).toContain('stylesheet')
+    expect(styleNode.properties.href).toBe(
+      'https://esm.sh/mind-elixir/style'
+    )
+
     expect(scriptNode.properties.type).toBe('module')
+    expect(scriptNode.properties.src).toBe(
+      'https://esm.sh/rehype-mind-elixir@latest/client'
+    )
 
     expect(
-      scriptNode.properties['data-engine']
+      scriptNode.properties.dataEngine ||
+        scriptNode.properties['data-engine']
     ).toBe('zikojs, rehype, mind-elixir')
   })
 
@@ -163,23 +167,17 @@ children:
     const styleNode = tree.children.find(
       node =>
         node.type === 'element' &&
-        node.tagName === 'style' &&
-        node.children.some(
-          child =>
-            child.type === 'text' &&
-            child.value.includes('mind-elixir/style')
-        )
+        node.tagName === 'link' &&
+        node.properties?.rel?.includes('stylesheet') &&
+        node.properties?.href === 'https://esm.sh/mind-elixir/style'
     )
 
     const scriptNode = tree.children.find(
       node =>
         node.type === 'element' &&
         node.tagName === 'script' &&
-        node.children.some(
-          child =>
-            child.type === 'text' &&
-            child.value.includes('@zikojs/mind-elixir')
-        )
+        node.properties?.src ===
+          'https://esm.sh/rehype-mind-elixir@latest/client'
     )
 
     expect(styleNode).toBeUndefined()
@@ -202,13 +200,22 @@ console.log('hello')
     const styleNode = tree.children.find(
       node =>
         node.type === 'element' &&
-        node.tagName === 'style'
+        (
+          node.tagName === 'style' ||
+          (
+            node.tagName === 'link' &&
+            node.properties?.href ===
+              'https://esm.sh/mind-elixir/style'
+          )
+        )
     )
 
     const scriptNode = tree.children.find(
       node =>
         node.type === 'element' &&
-        node.tagName === 'script'
+        node.tagName === 'script' &&
+        node.properties?.src ===
+          'https://esm.sh/rehype-mind-elixir@latest/client'
     )
 
     expect(styleNode).toBeUndefined()
@@ -240,11 +247,8 @@ children:
       node =>
         node.type === 'element' &&
         node.tagName === 'script' &&
-        node.children.some(
-          child =>
-            child.type === 'text' &&
-            child.value.includes('@zikojs/mind-elixir')
-        )
+        node.properties?.src ===
+          'https://esm.sh/rehype-mind-elixir@latest/client'
     )
 
     expect(scripts).toHaveLength(1)

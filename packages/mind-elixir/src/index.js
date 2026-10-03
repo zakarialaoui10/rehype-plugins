@@ -1,5 +1,6 @@
-import { visit } from "unist-util-visit";
+import { visit, SKIP } from "unist-util-visit";
 import { parseAllDocuments } from "yaml";
+import { toString } from "hast-util-to-string";
 
 import { 
   parseMindBody,
@@ -9,76 +10,77 @@ import {
 const rehypeMindElixir = ({ useCdn = true } = {}) => {
   return function transformer(tree) {
     let hasElixirMind = false;
+    let headNode = null;
+    let bodyNode = null;
 
     visit(tree, "element", (node, index, parent) => {
-      if(node.tagName !== "pre" || !node.children?.length) {
+      if (node.tagName === "head") headNode = node;
+      if (node.tagName === "body") bodyNode = node;
+
+      if (node.tagName !== "pre" || !node.children?.length) {
         return;
       }
 
       const code = node.children.find(
-        (child) => child.type === "element" && child.tagName === "code");
-      if(!code) return;
+        (child) => child.type === "element" && child.tagName === "code"
+      );
+      if (!code) return;
+
       const className = code.properties?.className || [];
       const classes = Array.isArray(className) ? className : [className];
-      if(!classes.includes("language-mind-elixir")) {
+      if (!classes.includes("language-mind-elixir")) {
         return;
       }
-      hasElixirMind = true;
-      const value = code.children
-        .filter((child) => child.type === "text")
-        .map((child) => child.value)
-        .join("");
 
+      hasElixirMind = true;
+
+      const value = toString(code);
       const documents = splitDocuments(value);
 
       let config = {};
       let bodyText;
 
-      if(documents.length === 1) bodyText = documents[0];
-      else {
+      if (documents.length === 1) {
+        bodyText = documents[0];
+      } else {
         config = parseAllDocuments(documents[0])[0]?.toJSON() || {};
         bodyText = documents[1];
       }
 
       const parsedBody = parseMindBody(bodyText);
 
-      /*
-       * Keep plain text untouched.
-       *
-       * JSON and JSON-like data need serialization because they
-       * are objects at this point.
-       */
       const serializedBody = parsedBody.type === "plain-text"
-          ? parsedBody.body
-          : JSON.stringify(parsedBody.body);
+        ? parsedBody.body
+        : JSON.stringify(parsedBody.body);
 
       parent.children[index] = {
         type: "element",
         tagName: "div",
         properties: {
-          "data-mind-elixir": "",
-          "data-xmind-body": serializedBody,
-          "data-xmind-type": parsedBody.type,
-          "data-xmind-config": JSON.stringify(config),
+          dataMindElixir: "",
+          dataXmindBody: serializedBody,
+          dataXmindType: parsedBody.type,
+          dataXmindConfig: JSON.stringify(config),
         },
         children: [],
       };
+
+      // Skip traversing children of the newly replaced element
+      return [SKIP, index + 1];
     });
 
-    if(!hasElixirMind || !useCdn) {
+    if (!hasElixirMind || !useCdn) {
       return;
     }
 
     const styleNode = {
       type: "element",
-      tagName: "style",
-      properties: {},
-      children: [
-        {
-          type: "raw",
-          value: "@import url('https://esm.sh/mind-elixir/style')",
-        },
-      ],
+      tagName: "link",
+      properties: {
+        rel: "stylesheet",
+        href: "https://esm.sh/mind-elixir/style",
+      },
+      children: [],
     };
 
     const scriptNode = {
@@ -86,30 +88,18 @@ const rehypeMindElixir = ({ useCdn = true } = {}) => {
       tagName: "script",
       properties: {
         type: "module",
-        "data-engine": "zikojs, rehype, mind-elixir",
+        dataEngine: "zikojs, rehype, mind-elixir",
+        src: "https://esm.sh/rehype-mind-elixir@latest/client",
       },
-      children: [
-        {
-          type: "raw",
-          value: `import 'https://esm.sh/rehype-mind-elixir@latest/client'`,
-        },
-      ],
+      children: [],
     };
 
-    let headNode = null;
-    let bodyNode = null;
-
-    visit(tree, "element", (node) => {
-      if(node.tagName === "head") headNode = node;
-      if(node.tagName === "body") bodyNode = node;
-    });
-
-    if(headNode) headNode.children.push(styleNode);
+    if (headNode) headNode.children.push(styleNode);
     else tree.children.unshift(styleNode);
-    if(bodyNode) bodyNode.children.push(scriptNode);
+    
+    if (bodyNode) bodyNode.children.push(scriptNode);
     else tree.children.push(scriptNode);
   };
 };
 
 export default rehypeMindElixir;
-
